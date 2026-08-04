@@ -357,11 +357,19 @@ fn cmd_resume() -> i32 {
 }
 
 fn cmd_doctor() -> i32 {
+    let wayland = is_wayland();
+    println!("session        = {}", if wayland { "wayland" } else { "x11" });
     println!(
         "DISPLAY        = {}",
         std::env::var("DISPLAY").unwrap_or_else(|_| "(not set)".into())
     );
-    for bin in ["xdotool", "xclip", "gsettings"] {
+
+    let bins: &[&str] = if wayland {
+        &["ydotool", "wl-copy", "gsettings"]
+    } else {
+        &["xdotool", "xclip", "gsettings"]
+    };
+    for bin in bins {
         println!(
             "{:<14} = {}",
             bin,
@@ -369,6 +377,41 @@ fn cmd_doctor() -> i32 {
                 .map(|p| p.display().to_string())
                 .unwrap_or_else(|| "MISSING".into())
         );
+    }
+
+    // On Wayland auto-paste goes through ydotool, which needs the ydotoold
+    // daemon reachable over its socket and access to /dev/uinput (the `input`
+    // group). Check both explicitly so a broken setup is obvious.
+    if wayland {
+        let in_input = Command::new("id")
+            .arg("-nG")
+            .output()
+            .ok()
+            .map(|o| {
+                String::from_utf8_lossy(&o.stdout)
+                    .split_whitespace()
+                    .any(|g| g == "input")
+            })
+            .unwrap_or(false);
+        println!(
+            "input group    = {}",
+            if in_input {
+                "yes"
+            } else {
+                "NO - run install.sh, then log out and back in"
+            }
+        );
+
+        let sock = std::env::var("YDOTOOL_SOCKET").unwrap_or_else(|_| {
+            let rt = std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".into());
+            format!("{rt}/.ydotool_socket")
+        });
+        let status = if std::path::Path::new(&sock).exists() {
+            format!("running (socket: {sock})")
+        } else {
+            format!("NOT running (no socket at {sock}) - `systemctl --user start ydotool` or re-login")
+        };
+        println!("ydotoold       = {status}");
     }
     println!(
         "daemon         = {}",
