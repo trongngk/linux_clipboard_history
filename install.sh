@@ -13,6 +13,9 @@ DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/cliphist-lite"
 say() { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
 have() { command -v "$1" >/dev/null 2>&1; }
 
+# Create the data/bin dirs up front so early steps (ydotoold log) can write.
+mkdir -p "$BIN_DIR" "$DATA_DIR"
+
 # --- session detection ---------------------------------------------------
 if [ -n "${WAYLAND_DISPLAY:-}" ] || [ "${XDG_SESSION_TYPE:-}" = "wayland" ]; then
   SESSION=wayland
@@ -23,6 +26,12 @@ say "Session: $SESSION   Desktop: ${XDG_CURRENT_DESKTOP:-unknown}"
 
 # --- dependencies --------------------------------------------------------
 missing=()
+# Build toolchain (needed on a fresh machine; cargo runs the build below).
+have cargo      || missing+=(cargo)
+have cc         || missing+=(build-essential)
+have pkg-config || missing+=(pkg-config)
+pkg-config --exists gtk+-3.0 2>/dev/null || missing+=(libgtk-3-dev)
+# Session-specific runtime helpers.
 if [ "$SESSION" = wayland ]; then
   have ydotool  || missing+=(ydotool)
   have wl-copy  || missing+=(wl-clipboard)
@@ -51,9 +60,19 @@ if [ "$SESSION" = wayland ]; then
     say "uinput access already granted"
   fi
 
-  # Start ydotoold (kernel-level virtual input daemon)
-  if systemctl --user list-unit-files 2>/dev/null | grep -q '^ydotoold\.service'; then
-    systemctl --user enable --now ydotoold || true
+  # Start the ydotoold daemon. The Ubuntu package ships it as the user service
+  # `ydotool.service`; other distros use `ydotoold.service`. Try both, then
+  # fall back to launching ydotoold directly.
+  unit=""
+  for u in ydotool ydotoold; do
+    if systemctl --user list-unit-files 2>/dev/null | grep -q "^${u}\.service"; then
+      unit="$u"
+      break
+    fi
+  done
+  if [ -n "$unit" ]; then
+    say "Enabling user service $unit.service"
+    systemctl --user enable --now "$unit" || true
   elif ! pgrep -x ydotoold >/dev/null; then
     say "Starting ydotoold in the background"
     nohup ydotoold >"$DATA_DIR/ydotoold.log" 2>&1 &

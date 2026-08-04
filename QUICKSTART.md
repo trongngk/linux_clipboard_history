@@ -10,9 +10,10 @@ with `Super+V`, keeps the last 20 entries. Works on **Cinnamon/X11** and
 
 **Install & run — the easy way (recommended)**
 ```bash
-sudo apt install cargo build-essential pkg-config libgtk-3-dev fonts-inter fonts-jetbrains-mono
-./install.sh        # detects X11/Wayland, installs helpers, binds Super+V, starts the daemon
+./install.sh        # installs build toolchain + helpers, detects X11/Wayland, binds Super+V, starts daemon
 ```
+`install.sh` installs everything it needs (cargo, GTK, xdotool/ydotool, …). Fonts
+are optional/cosmetic: `sudo apt install fonts-inter fonts-jetbrains-mono`.
 On Wayland, `install.sh` adds you to the `input` group for auto-paste — **log out
 and back in once** after the first run. Then `./update.sh` handles every later
 rebuild.
@@ -59,9 +60,10 @@ re-login, and run `ydotoold` (see INSTALL.md §4b).
 
 **Cài & chạy — cách nhanh (khuyên dùng)**
 ```bash
-sudo apt install cargo build-essential pkg-config libgtk-3-dev fonts-inter fonts-jetbrains-mono
-./install.sh        # tự nhận X11/Wayland, cài helper, gán Super+V, chạy daemon
+./install.sh        # cài build toolchain + helper, tự nhận X11/Wayland, gán Super+V, chạy daemon
 ```
+`install.sh` tự cài mọi thứ cần (cargo, GTK, xdotool/ydotool, …). Font là tùy
+chọn cho đẹp: `sudo apt install fonts-inter fonts-jetbrains-mono`.
 Trên Wayland, `install.sh` thêm bạn vào group `input` để auto-paste chạy được —
 **đăng xuất/đăng nhập lại 1 lần** sau lần chạy đầu. Sau đó mọi lần build lại chỉ
 cần `./update.sh`.

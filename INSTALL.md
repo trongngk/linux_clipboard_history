@@ -9,9 +9,10 @@ images, opens with `Super+V`, keeps the last 20 entries. Works on
 ## 0. The fast path: `install.sh`
 
 If you just want it working, the script does everything in this document
-automatically — it detects X11 vs Wayland, installs the right helpers, sets up
-`/dev/uinput` access for Wayland auto-paste, symlinks the binary, binds `Super+V`
-(GNOME **or** Cinnamon), writes autostart, and starts the daemon:
+automatically — it detects X11 vs Wayland, installs the **build toolchain**
+(cargo, build-essential, pkg-config, libgtk-3-dev) **and** the runtime helpers,
+sets up `/dev/uinput` access for Wayland auto-paste, symlinks the binary, binds
+`Super+V` (GNOME **or** Cinnamon), writes autostart, and starts the daemon:
 
 ```bash
 cd cliphist-rs
