@@ -1,0 +1,34 @@
+[package]
+name = "cliphist"
+version = "0.3.0"
+edition = "2021"
+description = "Clipboard history cho Linux — Cinnamon/X11 và GNOME/Wayland"
+
+[dependencies]
+gtk = "0.18"
+rusqlite = { version = "0.31", features = ["bundled"] }
+x11-clipboard = "0.9"
+x11rb = "0.13"
+sha2 = "0.10"
+regex = "1"
+libc = "0.2"
+
+# --- ghim version cho toolchain cũ (rustc 1.75 của Mint/Ubuntu 24.04) ---
+# các bản mới hơn của mấy crate này yêu cầu edition2024 -> cargo 1.75 không parse được
+indexmap = "=2.7.1"
+serde = "=1.0.210"
+rustix = "=0.38.34"
+cc = "=1.1.31"
+semver = "=1.0.23"
+shlex = "=1.3.0"
+toml = "=0.8.19"
+toml_edit = "=0.22.22"
+winnow = "=0.6.20"
+proc-macro2 = "=1.0.89"
+syn = "=2.0.87"
+
+[profile.release]
+opt-level = 2
+lto = true
+strip = true
+codegen-units = 1
