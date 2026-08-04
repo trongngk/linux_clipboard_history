@@ -28,7 +28,7 @@ Or just run it by full path this session: `~/.local/bin/cliphist doctor`.
 
 **GNOME instead of Cinnamon?** `cliphist install` binds Super+V via Cinnamon only.
 On GNOME, add it by hand: **Settings → Keyboard → View and Customize Shortcuts →
-Custom Shortcuts → +**, Command `~/.local/bin/cliphist pick --paste`, shortcut `Super+V`.
+Custom Shortcuts → +**, Command `~/.local/bin/cliphist pick --paste` (or try /home/<user>/.local/bin/cliphist pick --paste), shortcut `Super+V`.
 
 **Everyday use**
 - `Super+V` → open the panel next to the cursor · `Enter` copy · `Alt+1..9` quick pick · `Ctrl+P` pin · `Del` delete · `Esc` close
